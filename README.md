@@ -121,6 +121,16 @@ All features were retained due to their independent utility and performance gain
 | Random Forest       | Robust and accurate                          |
 | Neural Network (MLP)| Captures complex feature interactions        |
 
+### 📊 Model Performance Summary
+
+| Model                | Accuracy | Precision | Recall | F1-Score |
+|----------------------|----------|-----------|--------|----------|
+| Logistic Regression  | 0.79     | 0.38      | 0.19   | 0.25     |
+| Decision Tree        | 0.81     | 0.48      | 0.33   | 0.39     |
+| Random Forest        | 0.84     | 0.61      | 0.42   | 0.50     |
+| Neural Network (MLP) | 0.85     | 0.65      | 0.44   | 0.52     |
+
+> These metrics are based on evaluation using a stratified test split. Due to class imbalance, **precision**, **recall**, and **F1-score** were prioritized over raw accuracy.
 ---
 
 ## 🔍 Hyperparameter Tuning with Grid Search
@@ -205,5 +215,3 @@ Given imbalance, we used:
 **Lonika Bhavani**  
 IA651 – Spring 2025  
 Department of Data Science
-
----
