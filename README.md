@@ -212,6 +212,7 @@ Given imbalance, we used:
 ## 👩‍💻 Author
 
 - **Rishi Chendrayan**
-- **Lonika Bhavani**  
+- **Lonika Bhavani**
+
 IA651 – Spring 2025  
 Department of Data Science
