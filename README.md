@@ -1,136 +1,209 @@
+# 🏥 Healthcare Appointment No-Show Prediction
 
-# 🏥 Predicting Patient No-Shows for Healthcare Appointments
+This project predicts whether a patient will miss a scheduled healthcare appointment using demographic and appointment-related data. Built for IA651 (Spring 2025) by **Bhavani Chendrayan**, the project combines EDA, feature engineering, and classification models.
 
-## 📊 Dataset Description
+---
 
-This project utilizes the **"No-show appointments" dataset**, which includes information on **medical appointment records in Brazil**. Each record indicates whether a patient showed up for a scheduled appointment and includes demographics, health-related variables, and SMS reminder information.
+## 📁 Dataset Description
 
-### 📌 Key Fields:
-- `Gender`: Binary gender (F/M)
-- `Age`: Patient age
-- `Scholarship`: Indicates welfare program participation
-- `Hipertension`, `Diabetes`, `Alcoholism`, `Handcap`: Health conditions (binary)
-- `SMS_received`: Whether the patient received an SMS reminder
-- `ScheduledDay`, `AppointmentDay`: Date fields to compute appointment delay
-- `Showed_up`: Target variable (Yes/No → 1/0)
+- **Source**: Brazilian public healthcare system  
+- **Dataset**: `healthcare_noshows.csv`  
+- **Observations**: 110,527  
+- **Fields**: 14 (reduced to ~9 features post-cleaning)
 
-## 🎯 Project Objective
+### Key Features
 
-We aim to **predict whether a patient will attend a medical appointment** using demographic and health-related features.
+| Field            | Description                                        |
+|------------------|----------------------------------------------------|
+| `Gender`         | Male/Female indicator                              |
+| `Age`            | Patient’s age                                      |
+| `ScheduledDay`   | When appointment was booked                        |
+| `AppointmentDay` | Actual appointment date                            |
+| `Scholarship`    | Indicates welfare enrollment                       |
+| `Hypertension`   | 0/1 indicator                                      |
+| `Diabetes`       | 0/1 indicator                                      |
+| `Alcoholism`     | 0/1 indicator                                      |
+| `SMS_received`   | Whether a reminder SMS was sent                    |
+| `No-show`        | Target variable: 1 = missed, 0 = attended          |
 
-### 📈 Practical Use:
-- Helps clinics **optimize scheduling**
-- Enables targeted **reminders or interventions**
-- Reduces **resource waste** due to no-shows
+This data allows health centers to anticipate no-shows and optimize their scheduling systems.
+
+---
+
+## 🎯 Prediction Goal
+
+We aim to predict the likelihood of a no-show. This could:
+- Enable double-booking strategies
+- Reduce idle time in clinics
+- Target reminders to high-risk patients
+
+---
 
 ## 🔄 Process Overview
 
-The project followed a structured ML workflow:
-1. Data loading and cleaning
-2. Feature engineering (`date.diff`, binary encoding)
-3. Exploratory Data Analysis (EDA)
-4. Model training using multiple classifiers (Logistic Regression, Random Forest, Neural Network)
-5. Evaluation via confusion matrix, ROC, and PR curves
+The project followed an iterative structure:
+- Initial exploration with `pd.get_dummies` led to pipeline issues — corrected by using `OneHotEncoder`.
+- Accuracy was misleading due to class imbalance — switched to precision, recall, and F1-score.
+- Decision Tree and Logistic Regression showed weaknesses — Random Forest and Neural Networks used.
+- Grid search with cross-validation tuned model parameters.
 
-## 🧭 Narrative & Iterations
+---
 
-- Initially attempted full feature set
-- Created `days_waited` as the difference between `AppointmentDay` and `ScheduledDay`
-- Pivoted from simple classifiers to MLP due to nonlinear relationships
-- Handled boolean and datetime types explicitly
-- Added dropout layers to reduce overfitting in Neural Network
+## 📊 EDA
 
-## 🔍 Exploratory Data Analysis (EDA)
+### Target: `no_show` (binary classification)
 
-- **Target (Y)**: `Showed_up` (0 = No, 1 = Yes)
-- **Features (X)**: Age, Gender, Scholarship, Medical conditions, `days_waited`, SMS
-- **Classification task**
-- **Observations**: ~110,000, **Features**: ~10 after cleanup
-- **Imbalanced features**:
-  - `Alcoholism`, `Handcap`: Heavily skewed toward 0
-  - `SMS_received`: 1 ≈ 30%
-- **Target Distribution**:
-  - Showed Up: ~80%
-  - No-Show: ~20%
+- **X variables**: All features excluding `no_show`
+- **Y variable**: `no_show`
+- **Type**: Classification
+- **Class distribution**: ~20% No-show, 80% Show
+- **Observations**: 110,527
+- **Features**: 8–10 post-processing
 
-### 📌 Correlations
-- Moderate correlation between `Hipertension` and `Diabetes`
-- `days_waited` negatively correlated with attendance
+### Notable Distributions
 
-## 🧰 Feature Engineering
+- `days_waited` was negatively skewed — clipped to 0.
+- `Age`: right-skewed with outliers (age 0 and 100+)
+- `SMS_received`: mostly zero
 
-- Dropped ID/date fields after extracting useful info (`days_waited`)
-- Converted booleans to 0/1
-- Label encoded `Gender`
-- No need for One-Hot due to binary structure
+### Correlation
 
-## 🤖 Model Fitting
+- Minimal collinearity found
+- Used feature importance from Random Forest and Decision Tree
 
-- Used train/test split: 80/20
-- Scaled features using `StandardScaler`
-- Models evaluated:
-  - Logistic Regression
-  - Random Forest
-  - **Neural Network (MLPClassifier, Keras Sequential)**
+### Feature Importance
 
-### ⚠️ Leakage Consideration:
-- Dates used only to compute delay, then dropped
-- No patient ID or neighborhood used
+| Rank | Feature           |
+|------|-------------------|
+| 1    | `days_waited`     |
+| 2    | `age`             |
+| 3    | `sms_received`    |
+| 4    | `hypertension`    |
 
-## 🔬 Hyperparameter Tuning
+All features were retained due to their independent utility and performance gain.
 
-- Used `GridSearchCV` on `MLPClassifier`
-  - Explored activation functions, `alpha`, solver, layer sizes
-- Keras model used:
-  - 2 hidden layers (64, 32)
-  - Dropout (0.3, 0.2)
-  - Sigmoid output, binary crossentropy loss
+---
+
+## 🧠 Feature Engineering
+
+### Engineered Features
+
+- `days_waited = AppointmentDay - ScheduledDay`
+- `scheduled_dayofweek` and `appointment_dayofweek`
+- `age_group` via binning (`Child`, `Teen`, etc.)
+
+### Encoding
+
+- `OneHotEncoder` for categorical fields
+- Avoided `pd.get_dummies` for pipeline compatibility
+
+---
+
+## ⚙️ Model Fitting
+
+### Train/Test Split
+
+- 80/20 split using `train_test_split`
+- Stratified on `no_show`
+- Scaling and encoding embedded in `Pipeline` to avoid leakage
+
+### Data Leakage
+
+- Avoided by dropping ID/date columns
+- `StandardScaler` applied only within training folds
+
+### Models Tried
+
+| Model               | Reason                                       |
+|---------------------|----------------------------------------------|
+| Logistic Regression | Baseline, interpretable                      |
+| Decision Tree       | Handles non-linearity, fast                  |
+| Random Forest       | Robust and accurate                          |
+| Neural Network (MLP)| Captures complex feature interactions        |
+
+---
+
+## 🔍 Hyperparameter Tuning with Grid Search
+
+Used `GridSearchCV` with 5-fold cross-validation:
+
+- **LogReg**: `C`
+- **DecisionTree**: `max_depth`, `min_samples_split`
+- **Random Forest**: `n_estimators`, `max_depth`
+- **MLPClassifier**: `hidden_layer_sizes`, `alpha`, `learning_rate_init`
+
+All models were embedded in pipelines, ensuring preprocessing integrity.
+
+---
 
 ## 📏 Validation & Metrics
 
-- **Primary metrics**: Accuracy, Precision, Recall, F1
-- **ROC-AUC** and **PR curves** plotted
-- Confusion matrix revealed:
-  - High true positive rate
-  - Moderate false positive rate (some no-shows predicted as present)
+Given imbalance, we used:
+- **Precision**
+- **Recall**
+- **F1-score**
+- `classification_report` and confusion matrix
 
-### Sample Metrics:
-- Accuracy: ~82%
-- Precision: ~84%
-- Recall: ~90%
-- F1: ~87%
+| Metric     | Reason                                 |
+|------------|----------------------------------------|
+| Precision  | Avoid false alarms                     |
+| Recall     | Catch as many no-shows as possible     |
+| F1-score   | Balanced metric                        |
 
-## 🧪 Prediction Examples
+---
 
-### Real:
-- [✓] 45-year-old female, diabetic, received SMS → Showed up
-- [✗] 19-year-old male, long wait time, no SMS → No-show
+## 🧪 Predictions
 
-### Synthesized:
-- [✓] 65-year-old hypertensive, short wait → Showed up
-- [✗] 23-year-old no conditions, 20-day wait → No-show
+### Real Examples
+
+| Patient Summary                            | Predicted | Actual |
+|--------------------------------------------|-----------|--------|
+| 45 y/o, 0-day wait, SMS received           | Show      | Show   |
+| 79 y/o, 15-day wait, no SMS                | No-show   | No-show|
+
+### Synthetic Examples
+
+| Hypothetical Patient                      | Prediction |
+|-------------------------------------------|------------|
+| 25 y/o, 3-day wait, SMS received          | Show       |
+| 60 y/o, 20-day wait, chronic illness      | No-show    |
+
+---
 
 ## ⚖️ Overfitting / Underfitting
 
-- Early signs of overfitting in the base MLP
-- Mitigated using:
-  - Dropout layers
-  - Validation split
-  - Reduced epochs + EarlyStopping
+| Model         | Behavior         | Fixes Applied                 |
+|---------------|------------------|-------------------------------|
+| Logistic Reg. | Underfit         | Used interactions, scaling    |
+| Decision Tree | Overfit          | Pruned with `max_depth`       |
+| Random Forest | Balanced         | Ensemble effect               |
+| Neural Net    | Slight overfit   | Dropout + early stopping      |
 
-## 🚀 Production & Deployment
+---
 
-### Cautions:
-- Must retrain regularly as **patient behavior changes**
-- SMS impact could vary across **regions or times**
+## 🚀 Production Considerations
 
-### Deployment advice:
-- Deploy behind an API endpoint for hospital systems
-- Use explainability tools (e.g., SHAP) in clinical settings
+- Set up retraining every month with new data
+- Threshold tuning required for real-time deployment
+- Alert doctors/admins about likely no-shows
+- Model fairness: monitor for age/gender bias
 
-## 🔮 Going Further
+---
 
-- Incorporate location, prior appointment history
-- Use time-of-day or day-of-week features
-- More advanced models: XGBoost, ensemble stacking
-- Balance classes using SMOTE or class weights
+## 🔭 Going Further
+
+- Include `Neighbourhood` as geospatial feature
+- Try advanced models (XGBoost, LightGBM)
+- Use SMOTE or Focal Loss for imbalance
+- Add historical appointment behavior features
+
+---
+
+## 👩‍💻 Author
+
+**Rishi Chendrayan**
+**Lonika Bhavani**  
+IA651 – Spring 2025  
+Department of Data Science
+
+---
