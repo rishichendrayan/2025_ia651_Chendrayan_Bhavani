@@ -27,8 +27,7 @@ This project predicts whether a patient will miss a scheduled healthcare appoint
 | `No-show`        | Target variable: 1 = missed, 0 = attended          |
 
 This data allows health centers to anticipate no-shows and optimize their scheduling systems.
-
-![Data Exploration](/Images/Data Exploration.png)
+![screenshot](Images/Data Exploration.png)
 ---
 
 ## 🎯 Prediction Goal
