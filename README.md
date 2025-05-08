@@ -28,7 +28,7 @@ This project predicts whether a patient will miss a scheduled healthcare appoint
 
 This data allows health centers to anticipate no-shows and optimize their scheduling systems.
 
-![Data Exploration](Images/Data Exploration.png)
+![Data Exploration](/Images/Data Exploration.png)
 ---
 
 ## 🎯 Prediction Goal
