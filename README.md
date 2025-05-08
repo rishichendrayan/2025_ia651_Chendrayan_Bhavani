@@ -84,6 +84,8 @@ The project followed an iterative structure:
 
 All features were retained due to their independent utility and performance gain.
 
+![Feature Importance](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Feature%20Importance.png)
+
 ---
 
 ## 🧠 Feature Engineering
@@ -133,6 +135,17 @@ All features were retained due to their independent utility and performance gain
 | Neural Network (MLP) | 0.85     | 0.65      | 0.44   | 0.52     |
 
 > These metrics are based on evaluation using a stratified test split. Due to class imbalance, **precision**, **recall**, and **F1-score** were prioritized over raw accuracy.
+
+![Logistic Regression VS Random Forest](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Logistic%20Regression%20vs%20Random%20Forest.png)
+
+![Decission Tree](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Decission%20Tree.png)
+
+![Nueral Network](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Nueral%20Network.png)
+
+![Confusion Matrix for Nueral Network](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Nueral%20Netwrk%20Confusion%20Matrix.png)
+
+![Precission Recall Curve](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Precision-Recall%20Curve.png)
+
 ---
 
 ## 🔍 Hyperparameter Tuning with Grid Search
@@ -145,6 +158,8 @@ Used `GridSearchCV` with 5-fold cross-validation:
 - **MLPClassifier**: `hidden_layer_sizes`, `alpha`, `learning_rate_init`
 
 All models were embedded in pipelines, ensuring preprocessing integrity.
+
+![Confusion Matrix for Grid Search](https://github.com/rishichendrayan/2025_ia651_Chendrayan_Bhavani/blob/main/Images/Grid%20Search.png)
 
 ---
 
